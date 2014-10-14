@@ -16,6 +16,8 @@ class Board():
 
     def initiate_board(self):
         pass
+    def getHeight(self):
+        return
 
 
 
@@ -37,8 +39,9 @@ def SA():
         p_max = evaluate_neighbours()
 
 
-        q = ((p_max)−F(P))/F(P )
-        p = min [1, e^−q/T) ]
+        q = (objective(p_max) - (objective(board)/objective(board)))
+
+        p = min(1, math.e**(-q/temperature))
 
         x = math.random();
 
@@ -51,14 +54,12 @@ def SA():
 
 
 
+def objective(board):
+    if board.validate_board():
+        return board.calculate_score()
+    else:
+        return 0;
 
-def Generate_neighbours():
-    return 0
-
-
-
-def objective(P):
-    return 0
 
 
 def evaluate_neighbours():
