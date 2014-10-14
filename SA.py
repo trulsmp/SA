@@ -8,39 +8,59 @@ m = n = 5
 k = 2
 
 class Board:
-    BoardArray = [[]]
+    board_array = []
     def __init__(self, m, n, k):
         self.rows = m
         self.cols = n
         self.eggs = k
+        board_array = self.initiate_board()
 
     def validate_board(self):
-        pass
+        return True
 
     def calculate_score(self):
-        pass
+        score = 0
+        for i in range(0,m):
+            for j in range(0,n):
+                if [i][j] == 1:
+                    score += 1
+
 
     def initiate_board(self):
         board = []
         for i in range(0,m):
             board.append([])
             for j in range(0,n):
-                board[i].append('X')
+                self.board_array[i].append(0)
         return board
+
+    def generate_start(self):
+
+        pass
+
+    def print_board(self):
+        for i in range(0,m):
+            for j in range(0,n):
+                print(self.board_array[i][j])
+            print("\n")
+
 
 
 
 def SA():
-    target = 10  # ?????
-    temperature = 20  # ???
+
+    m = int(input("M value: "))
+    n = int(input("N value: "))
+    k = int(input("K value: "))
+
+
+    temperature = 3000  # ???
     board = Board(m, n, k)
-    board.initiate_board()
-    start = board[0][0]
+    board.generateStart()
 
     F = objective(board)  # Objective function
-    while True:
-        if F > target:
-            return Board;
+
+    '''' while True:
 
         neighbours = generate_neighbours()
         p_max = evaluate_neighbours()
@@ -57,7 +77,7 @@ def SA():
         else:
             board = 0 #random choice
 
-        temperature = temperature - 1
+        temperature = temperature - 1 '''''
 
 
 
@@ -81,4 +101,4 @@ def generate_neighbours():
 
 
 
-
+SA()
