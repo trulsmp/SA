@@ -2,74 +2,33 @@ __author__ = 'trulsmp'
 import math
 import random
 
-#m = int(input("How many rows? "))
-#n = int(input("How many cols? "))
-#k = int(input("How many eggs? "))
-m = n = 5
-k = 2
+m = int(input("M value: "))
+n = int(input("N value: "))
+k = int(input("K value: "))
+    
 
-
-
-def validate_board(self):
+def validate_board(board):
     return True
 
-def calculate_score(self):
+def calculate_score(board):
     score = 0
     for i in range(0,m):
         for j in range(0,n):
-            if [i][j] == 1:
+            if board[i][j] == '1':
                 score += 1
+    return score
 
 
-
-
-
-
-
-
-def print_board(self):
+def print_board(board):
+    string = ''
     for i in range(0,m):
+        string += '\n'
         for j in range(0,n):
-            print(self.board_array[i][j])
-        print("\n")
+            string += (board[i][j]) +""
+    return string
 
 
-
-
-def SA():
-
-    m = int(input("M value: "))
-    n = int(input("N value: "))
-    k = int(input("K value: "))
-
-
-    temperature = 3000  # ???
-    board = initiate_board(m, n)
-    print (generate_start(board))
-
-
-    F = objective(board)  # Objective function
-
-    '''' while True:
-
-        neighbours = generate_neighbours()
-        p_max = evaluate_neighbours()
-
-
-        q = (objective(p_max) - (objective(board)/objective(board)))
-
-        p = min(1, math.e**(-q/temperature))
-
-        x = math.random();
-
-        if x > p:
-            board = p_max
-        else:
-            board = 0 #random choice
-
-        temperature = temperature - 1 '''''
-
-def initiate_board(m, n):
+def initiate_board():
     board = []
     for i in range(0,m):
         board.append([])
@@ -87,17 +46,14 @@ def generate_start(board):
             eggs -= 1
         if eggs == 0:
             break
-    print(board)
+    return board
 
 def objective(board):
-    if board.validate_board():
-        return board.calculate_score()
+    if validate_board(board):
+        print ("calculating score")
+        return calculate_score(board)
     else:
         return 0;
-
-
-def objective(P):
-    return 0
 
 
 def evaluate_neighbours():
@@ -106,7 +62,49 @@ def evaluate_neighbours():
 def generate_neighbours():
     pass
 
+def checkRow(board):
+	count = 0
+	for i in board:
+		if (i == '1'):
+			count += 1
+			if (count > 2):
+				return False
+		elif (i == '\n'):
+			count = 0
+	return True
 
+
+
+def SA():
+    
+    temperature = 3000  # ???
+    board = initiate_board()
+    board = generate_start(board)
+    print(print_board(board))
+    print(checkRow(print_board(board)))
+    
+    
+    F = objective(board)  # Objective function
+    print (F)
+    
+    '''' while True:
+    
+        neighbours = generate_neighbours()
+        p_max = evaluate_neighbours()
+    
+    
+        q = (objective(p_max) - (objective(board)/objective(board)))
+    
+        p = min(1, math.e**(-q/temperature))
+    
+        x = math.random();
+    
+        if x > p:
+            board = p_max
+        else:
+            board = 0 #random choice
+    
+        temperature = temperature - 1 '''''
 
 
 SA()
