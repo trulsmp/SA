@@ -27,7 +27,7 @@ def print_board(board):
     for i in range(0,m):
         string += '\n'
         for j in range(0,n):
-            string += (board[i][j]) +""
+            string += (board[i][j]) + " "
     return string
 
 
@@ -123,14 +123,7 @@ def validateBoard(board, stringBoard):
 
     
 def SA():
-    temperature = 3000  # ???
-    board = initiate_board()
-    board = generate_start(board)
-    stringBoard = (print_board(board))
-    print(stringBoard)
-    checkDiagonal(board)
-    # print(validateBoard(board, stringBoard))
-  
+
    
     
     F = objective(board)  # Objective function
