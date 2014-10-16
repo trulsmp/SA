@@ -1,6 +1,7 @@
 __author__ = 'trulsmp & larsland'
 import math
 import random
+import numpy as np
 
 m = int(input("M value: "))
 n = int(input("N value: "))
@@ -90,8 +91,27 @@ def checkCol(board):
     return True
     
 def checkDiagonal(board):
-    #list = [board[i][i] for i in range(len(board))]
-    #print list
+    # create a numpy array
+    a = np.array(board)
+    # Then a list comprehension is used to collect all the diagonals
+    diags = [a[::-1,:].diagonal(i) for i in range(-a.shape[0]+1,a.shape[1])]
+
+    # Now back to the original array to get the upper-left-to-lower-right diagonals,
+    # starting from the right, so the range needed for shape (x,y) was y-1 to -x+1 descending.
+    diags.extend(a.diagonal(i) for i in range(a.shape[1]-1,-a.shape[0],-1))
+
+    # Another list comp to convert back to Python lists from numpy arrays
+    diagonals = [n.tolist() for n in diags]
+    eggs = 0
+    for i in diagonals:
+        for y in i:
+            if y == '1':
+                eggs += 1
+        if eggs > k:
+            print ("Total number of eggs in diagonal is above K value")
+            return False
+        eggs = 0
+
     return True
     
     
@@ -108,7 +128,8 @@ def SA():
     board = generate_start(board)
     stringBoard = (print_board(board))
     print(stringBoard)
-    print(validateBoard(board, stringBoard))
+    checkDiagonal(board)
+    # print(validateBoard(board, stringBoard))
   
    
     
