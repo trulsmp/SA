@@ -3,9 +3,10 @@ import math
 import random
 import numpy as np
 
-m = int(input("M value: "))
-n = int(input("N value: "))
+m = n = int(input("M and N value: "))
 k = int(input("K value: "))
+max_eggs = m*k
+
 
 def calculate_score(board):
     score = 0
@@ -34,7 +35,7 @@ def initiate_board():
     return board
 
 def generate_start(board):
-    eggs = 5
+    eggs = max_eggs
     while True:
         randomRow = random.randint(0, m - 1)
         randomCol = random.randint(0, n - 1)
@@ -47,10 +48,8 @@ def generate_start(board):
 
 def objective(board):
     if validateBoard(board):
-        print ("calculating score")
         return calculate_score(board)
     else:
-        print("No score")
         return 0;
 
 
@@ -61,8 +60,14 @@ def evaluate_neighbours(neighbours):
             highest_neighbour = i
     return highest_neighbour
 
-def generate_neighbours():
-    pass
+def generate_neighbours(board):
+    array = []
+    array.append(board)
+    for i in range(0,20):
+        new_board = initiate_board()
+        new_board = generate_start(new_board)
+        array.append(new_board)
+    return array
 
 
 def checkRow(board):
@@ -108,7 +113,6 @@ def checkDiagonal(board):
             if y == '1':
                 eggs += 1
         if eggs > k:
-            print ("Total number of eggs in diagonal is above K value")
             return False
         eggs = 0
 
@@ -123,37 +127,38 @@ def validateBoard(board):
 
     
 def SA():
-    temperature = 3000  # ???
+    temperature = 100000  # ???
 
     board = initiate_board()
     board = generate_start(board)
-    print_board(board)
-
-    print(checkCol(board))
-    print(checkRow(board))
-    print(checkDiagonal(board))
 
 
 
     F = objective(board)  # Objective function
-    print (F)
     
-    while True:
+    while temperature > 0:
     
         neighbours = generate_neighbours(board)
         p_max = evaluate_neighbours(neighbours)
-    
-        q = (objective(p_max) - (objective(board)/objective(board)))
+        if objective(p_max) > objective(board):
+            board = p_max
+        if objective(board) == max_eggs:
+            return board
+        ''' q = (objective(p_max) - (objective(board)/objective(board)))
     
         p = min(1, math.e**(-q/temperature))
     
-        x = math.random()
+        x = random.randint(0,1)
         if x > p:
             board = p_max
         else:
-            board = 0 #random choice
+            board = 0 #random choice '''''
     
-        temperature = temperature - 1
+        temperature -= 1
 
+    return board
 
-SA()
+final_board = SA()
+print_board(final_board)
+print (validateBoard(final_board))
+
