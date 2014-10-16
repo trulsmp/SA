@@ -1,10 +1,12 @@
-__author__ = 'trulsmp'
+__author__ = 'trulsmp & larsland'
 import math
 import random
 
 m = int(input("M value: "))
 n = int(input("N value: "))
 k = int(input("K value: "))
+
+validBoards = []
     
 
 def validate_board(board):
@@ -62,6 +64,7 @@ def evaluate_neighbours():
 def generate_neighbours():
     pass
 
+
 def checkRow(board):
 	count = 0
 	for i in board:
@@ -73,16 +76,41 @@ def checkRow(board):
 			count = 0
 	return True
 
-
-
-def SA():
+	
+def checkCol(board):
+    count = 0
+    for i in range(n):
+        count = 0
+        for x in range(m):
+            if (board[x][i] == '1'):
+                    count += 1
+        #print count
+        if count > k:
+            return False
+    return True
     
+def checkDiagonal(board):
+    #list = [board[i][i] for i in range(len(board))]
+    #print list
+    return True
+    
+    
+def validateBoard(board, stringBoard):
+    if (checkRow(stringBoard) and checkCol(board) and checkDiagonal(board)):
+        return True
+    else:
+        return False
+
+    
+def SA():
     temperature = 3000  # ???
     board = initiate_board()
     board = generate_start(board)
-    print(print_board(board))
-    print(checkRow(print_board(board)))
-    
+    stringBoard = (print_board(board))
+    print(stringBoard)
+    print(validateBoard(board, stringBoard))
+  
+   
     
     F = objective(board)  # Objective function
     print (F)
