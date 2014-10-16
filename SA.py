@@ -123,9 +123,18 @@ def validateBoard(board, stringBoard):
 
     
 def SA():
+    temperature = 10000  # ???
+    firstCorrect = []
+    x = True
+    while x:
+        board = initiate_board()
+        board = generate_start(board)
+        stringBoard = (print_board(board))
+        if (validateBoard(board, stringBoard)):
+            firstCorrect = board
+            x = False
+    print(print_board(firstCorrect))
 
-   
-    
     F = objective(board)  # Objective function
     print (F)
     
