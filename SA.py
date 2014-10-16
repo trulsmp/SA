@@ -7,12 +7,6 @@ m = int(input("M value: "))
 n = int(input("N value: "))
 k = int(input("K value: "))
 
-validBoards = []
-    
-
-def validate_board(board):
-    return True
-
 def calculate_score(board):
     score = 0
     for i in range(0,m):
@@ -28,7 +22,7 @@ def print_board(board):
         string += '\n'
         for j in range(0,n):
             string += (board[i][j]) + " "
-    return string
+    print(string)
 
 
 def initiate_board():
@@ -40,7 +34,7 @@ def initiate_board():
     return board
 
 def generate_start(board):
-    eggs = 10
+    eggs = 5
     while True:
         randomRow = random.randint(0, m - 1)
         randomCol = random.randint(0, n - 1)
@@ -52,30 +46,36 @@ def generate_start(board):
     return board
 
 def objective(board):
-    if validate_board(board):
+    if validateBoard(board):
         print ("calculating score")
         return calculate_score(board)
     else:
+        print("No score")
         return 0;
 
 
-def evaluate_neighbours():
-    pass
+def evaluate_neighbours(neighbours):
+    highest_neighbour = neighbours[0]
+    for i in neighbours:
+        if objective(i) > objective(highest_neighbour):
+            highest_neighbour = i
+    return highest_neighbour
 
 def generate_neighbours():
     pass
 
 
 def checkRow(board):
-	count = 0
-	for i in board:
-		if (i == '1'):
-			count += 1
-			if (count > 2):
-				return False
-		elif (i == '\n'):
-			count = 0
-	return True
+    count = 0
+    for i in range(n):
+        count = 0
+        for x in range(m):
+            if (board[i][x] == '1'):
+                    count += 1
+        #print count
+        if count > k:
+            return False
+    return True
 
 	
 def checkCol(board):
@@ -115,47 +115,45 @@ def checkDiagonal(board):
     return True
     
     
-def validateBoard(board, stringBoard):
-    if (checkRow(stringBoard) and checkCol(board) and checkDiagonal(board)):
+def validateBoard(board):
+    if checkRow(board) and checkCol(board) and checkDiagonal(board):
         return True
     else:
         return False
 
     
 def SA():
-    temperature = 10000  # ???
-    firstCorrect = []
-    x = True
-    while x:
-        board = initiate_board()
-        board = generate_start(board)
-        stringBoard = (print_board(board))
-        if (validateBoard(board, stringBoard)):
-            firstCorrect = board
-            x = False
-    print(print_board(firstCorrect))
+    temperature = 3000  # ???
+
+    board = initiate_board()
+    board = generate_start(board)
+    print_board(board)
+
+    print(checkCol(board))
+    print(checkRow(board))
+    print(checkDiagonal(board))
+
+
 
     F = objective(board)  # Objective function
     print (F)
     
-    '''' while True:
+    while True:
     
-        neighbours = generate_neighbours()
-        p_max = evaluate_neighbours()
-    
+        neighbours = generate_neighbours(board)
+        p_max = evaluate_neighbours(neighbours)
     
         q = (objective(p_max) - (objective(board)/objective(board)))
     
         p = min(1, math.e**(-q/temperature))
     
-        x = math.random();
-    
+        x = math.random()
         if x > p:
             board = p_max
         else:
             board = 0 #random choice
     
-        temperature = temperature - 1 '''''
+        temperature = temperature - 1
 
 
 SA()
