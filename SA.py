@@ -1,13 +1,17 @@
 __author__ = 'trulsmp & larsland'
 import math
-import random
 import numpy as np
+import random
+from random import randint, shuffle, randrange
 
+#Takes inn the size of the board, and maximum number of eggs in a row/col/diagonal from the user
 m = n = int(input("M and N value: "))
 k = int(input("K value: "))
+
+#The optimal number of eggs that can be placed on the board.
 max_eggs = m*k
 
-
+#Method for calculating the numbe rof eggs placed on the board
 def calculate_score(board):
     score = 0
     for i in range(0,m):
@@ -16,7 +20,7 @@ def calculate_score(board):
                 score += 1
     return score
 
-
+#Method for printing the board as a nice string
 def print_board(board):
     string = ''
     for i in range(0,m):
@@ -25,7 +29,7 @@ def print_board(board):
             string += (board[i][j]) + " "
     print(string)
 
-
+#Returns a 2d array with only '0's.
 def initiate_board():
     board = []
     for i in range(0,m):
@@ -34,26 +38,42 @@ def initiate_board():
             board[i].append('0')
     return board
 
+
 def generate_start(board):
+    '''
+    Takes the initial board, and places 'eggs' randomly on each row
+    of the board, while keeping the eggs to be less or equal to than the k-vlaue
+    in each row
+    '''
     eggs = max_eggs
-    while True:
-        randomRow = random.randint(0, m - 1)
-        randomCol = random.randint(0, n - 1)
-        if board[randomRow][randomCol] == '0':
-            board[randomRow][randomCol] = '1'
+    while eggs > 0:
+        for i in range(n):
+            x = randint(0,n-1)
+            board[i][x] = '1'
             eggs -= 1
-        if eggs == 0:
-            break
+            putted = 1
+            while putted < k:
+                y = randint(0,n-1)
+                if board[i][x] != board[i][y]:
+                    board[i][y] = '1'
+                    eggs -= 1
+                    putted += 1
     return board
 
+
+#Checks if the given board follows all the rules, and then calculates the score for it
 def objective(board):
     if validateBoard(board):
         return calculate_score(board)
     else:
-        return 0;
+        return 1;
 
 
 def evaluate_neighbours(neighbours):
+    '''
+    Finds the best of the neighbours produced in the generate_neighbours 
+    method, based on its score and validness, then returns it.
+    '''
     highest_neighbour = neighbours[0]
     for i in neighbours:
         if objective(i) > objective(highest_neighbour):
@@ -61,15 +81,55 @@ def evaluate_neighbours(neighbours):
     return highest_neighbour
 
 def generate_neighbours(board):
-    array = []
-    array.append(board)
-    for i in range(0,20):
-        new_board = initiate_board()
-        new_board = generate_start(new_board)
-        array.append(new_board)
-    return array
+    '''
+    Generates a set of neighbours (new boards) out of the initial given board.
+    '''
+    to_check = []
+    cols = []
+    rows = []
+    # Finds all columns
+    for i in range (len(board)):
+        temp = []
+        for j in range(len(board)):
+            temp.append(board[j][i])
+        cols.append(temp)
+
+    # All columns with number of eggs > k, appended to a list
+    to_check = [row for row in cols if row.count('1') > k ]
+
+    # Finding all rows that has an egg in a column > k eggs, and adds it to rows.
+    for row in to_check:
+        for x in range(len(row)):
+            if row[x] == '1' and board[x] not in rows:
+                rows.append(board[x])
+
+    neighbours = []
+    for x in range(len(board)):
+        if board[x] in rows:
+            boardcopy = list(board)
+            row = board[x]
+            row = list(row)
+            shuffle(row)
+            board[x] = row
+            neighbours.append(board)
+            board = boardcopy
+
+    '''
+    This method doesn't handle situations with more than k eggs in
+    the diaglonals, so instead it shuffles the first row of the board
+    till the diagonals are fine.
+    '''
+    if len(neighbours) == 0:
+        neighbour = list(board)
+        row = board[0]
+        row = list(row)
+        shuffle(row)
+        neighbour[0] = row
+        return [neighbour]
+    return neighbours
 
 
+#Returns True if the board has no more than 2 eggs in each row, False otherwise
 def checkRow(board):
     count = 0
     for i in range(n):
@@ -82,7 +142,7 @@ def checkRow(board):
             return False
     return True
 
-	
+#Returns True if the board has no more than 2 eggs in each collumn, False otherwise
 def checkCol(board):
     count = 0
     for i in range(n):
@@ -94,8 +154,12 @@ def checkCol(board):
         if count > k:
             return False
     return True
-    
+
+#Returns True if the board has no more than 2 eggs in each diagonal, False otherwise
 def checkDiagonal(board):
+    '''
+    We use a module called numpy array to solve the diagonal check
+    '''
     # create a numpy array
     a = np.array(board)
     # Then a list comprehension is used to collect all the diagonals
@@ -118,19 +182,21 @@ def checkDiagonal(board):
 
     return True
     
-    
+#Help method for checking all the check-methods, to see if the given board is valid
 def validateBoard(board):
     if checkRow(board) and checkCol(board) and checkDiagonal(board):
         return True
     else:
         return False
 
-    
+#The main algorithm
 def SA():
-    temperature = 100000  # ???
+    temperature = 8000  # ???
 
     board = initiate_board()
     board = generate_start(board)
+    print_board(board)
+    max_board = board
 
 
 
@@ -140,11 +206,11 @@ def SA():
     
         neighbours = generate_neighbours(board)
         p_max = evaluate_neighbours(neighbours)
-        if objective(p_max) > objective(board):
-            board = p_max
+        if objective(max_board) < objective(p_max):
+            max_board = p_max
         if objective(board) == max_eggs:
             return board
-        ''' q = (objective(p_max) - (objective(board)/objective(board)))
+        q = (objective(p_max) - (objective(board)/objective(board)))
     
         p = min(1, math.e**(-q/temperature))
     
@@ -152,11 +218,10 @@ def SA():
         if x > p:
             board = p_max
         else:
-            board = 0 #random choice '''''
+            board = random.choice(neighbours)
     
-        temperature -= 1
-
-    return board
+        temperature -= 0.04
+    return max_board
 
 final_board = SA()
 print_board(final_board)
