@@ -1,7 +1,9 @@
 __author__ = 'trulsmp & larsland'
 import math
 import numpy as np
+
 import random
+
 from random import randint, shuffle, randrange
 
 #Takes inn the size of the board, and maximum number of eggs in a row/col/diagonal from the user
@@ -58,6 +60,7 @@ def generate_start(board):
                     board[i][y] = '1'
                     eggs -= 1
                     putted += 1
+
     return board
 
 
@@ -87,6 +90,7 @@ def generate_neighbours(board):
     to_check = []
     cols = []
     rows = []
+
     # Finds all columns
     for i in range (len(board)):
         temp = []
@@ -98,6 +102,8 @@ def generate_neighbours(board):
     to_check = [row for row in cols if row.count('1') > k ]
 
     # Finding all rows that has an egg in a column > k eggs, and adds it to rows.
+    rows = []
+
     for row in to_check:
         for x in range(len(row)):
             if row[x] == '1' and board[x] not in rows:
@@ -114,11 +120,13 @@ def generate_neighbours(board):
             neighbours.append(board)
             board = boardcopy
 
+
     '''
     This method doesn't handle situations with more than k eggs in
     the diaglonals, so instead it shuffles the first row of the board
     till the diagonals are fine.
     '''
+
     if len(neighbours) == 0:
         neighbour = list(board)
         row = board[0]
@@ -127,6 +135,7 @@ def generate_neighbours(board):
         neighbour[0] = row
         return [neighbour]
     return neighbours
+
 
 
 #Returns True if the board has no more than 2 eggs in each row, False otherwise
