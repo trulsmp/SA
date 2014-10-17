@@ -2,6 +2,7 @@ __author__ = 'trulsmp & larsland'
 import math
 import random
 import numpy as np
+from random import randint, shuffle, randrange
 
 m = n = int(input("M and N value: "))
 k = int(input("K value: "))
@@ -36,21 +37,29 @@ def initiate_board():
 
 def generate_start(board):
     eggs = max_eggs
-    while True:
-        randomRow = random.randint(0, m - 1)
-        randomCol = random.randint(0, n - 1)
-        if board[randomRow][randomCol] == '0':
-            board[randomRow][randomCol] = '1'
+    while eggs > 0:
+        for i in range(n):
+            x = randint(0,n-1)
+            board[i][x] = '1'
             eggs -= 1
-        if eggs == 0:
-            break
+            putted = 1
+            while putted < k:
+                y = randint(0,n-1)
+                if board[i][x] != board[i][y]:
+                    board[i][y] = '1'
+                    eggs -= 1
+                    putted += 1
+    return board
+
+
+
     return board
 
 def objective(board):
     if validateBoard(board):
         return calculate_score(board)
     else:
-        return 0;
+        return 1;
 
 
 def evaluate_neighbours(neighbours):
@@ -61,13 +70,49 @@ def evaluate_neighbours(neighbours):
     return highest_neighbour
 
 def generate_neighbours(board):
-    array = []
-    array.append(board)
-    for i in range(0,20):
-        new_board = initiate_board()
-        new_board = generate_start(new_board)
-        array.append(new_board)
-    return array
+
+    # Function that generates a set of neighbours (different boards) based on the current board state.
+    # Returns a list of n neighbours. The neighbours are only generated if there are columns or rows with
+    # egg > k.
+
+    to_check = []
+    cols = []
+    # Finds all columns
+    for i in range (len(board)):
+        temp = []
+        for j in range(len(board)):
+            temp.append(board[j][i])
+        cols.append(temp)
+    # All columns with number_of_eggs > k, appended to a list
+    to_check = [row for row in cols if row.count('1') > k ]
+    # Finding all rows that has an egg in a column > k eggs, and adds it to rows.
+    rows = []
+    for row in to_check:
+        for x in range(len(row)):
+            if row[x] == '1' and board[x] not in rows:
+                rows.append(board[x])
+
+    neighbours = []
+    for x in range(len(board)):
+        if board[x] in rows:
+            boardcopy = list(board)
+            row = board[x]
+            row = list(row)
+            shuffle(row)
+            board[x] = row
+            neighbours.append(board)
+            board = boardcopy
+
+    #If there is no neighbours, there is a conflict in the diagonals. We have no support for this, so shuffeling the first row
+
+    if len(neighbours) == 0:
+        neighbour = list(board)
+        row = board[0]
+        row = list(row)
+        shuffle(row)
+        neighbour[0] = row
+        return [neighbour]
+    return neighbours
 
 
 def checkRow(board):
@@ -127,10 +172,12 @@ def validateBoard(board):
 
     
 def SA():
-    temperature = 100000  # ???
+    temperature = 8000  # ???
 
     board = initiate_board()
     board = generate_start(board)
+    print_board(board)
+    max_board = board
 
 
 
@@ -140,11 +187,11 @@ def SA():
     
         neighbours = generate_neighbours(board)
         p_max = evaluate_neighbours(neighbours)
-        if objective(p_max) > objective(board):
-            board = p_max
+        if objective(max_board) < objective(p_max):
+            max_board = p_max
         if objective(board) == max_eggs:
             return board
-        ''' q = (objective(p_max) - (objective(board)/objective(board)))
+        q = (objective(p_max) - (objective(board)/objective(board)))
     
         p = min(1, math.e**(-q/temperature))
     
@@ -152,11 +199,10 @@ def SA():
         if x > p:
             board = p_max
         else:
-            board = 0 #random choice '''''
+            board = random.choice(neighbours)
     
-        temperature -= 1
-
-    return board
+        temperature -= 0.04
+    return max_board
 
 final_board = SA()
 print_board(final_board)
