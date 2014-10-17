@@ -1,14 +1,24 @@
 __author__ = 'trulsmp & larsland'
 import math
 import numpy as np
-
 import random
-
+import time
 from random import randint, shuffle, randrange
+
+class bcolors:
+    PURPLE = '\033[95m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    ENDC = '\033[0m'
 
 #Takes inn the size of the board, and maximum number of eggs in a row/col/diagonal from the user
 m = n = int(input("M and N value: "))
 k = int(input("K value: "))
+
+#Initiating a timer
+startTime = time.time()
 
 #The optimal number of eggs that can be placed on the board.
 max_eggs = m*k
@@ -26,9 +36,13 @@ def calculate_score(board):
 def print_board(board):
     string = ''
     for i in range(0,m):
-        string += '\n'
+        string += '|'
         for j in range(0,n):
-            string += (board[i][j]) + " "
+            if board[i][j] == "0":
+                string += bcolors.YELLOW + " - " + bcolors.ENDC
+            else: 
+                string += bcolors.GREEN + " O " + bcolors.ENDC
+        string += '|\n'
     print(string)
 
 #Returns a 2d array with only '0's.
@@ -200,14 +214,11 @@ def validateBoard(board):
 
 #The main algorithm
 def SA():
-    temperature = 8000  # ???
+    temperature = 1000000  # ???
 
     board = initiate_board()
     board = generate_start(board)
-    print_board(board)
     max_board = board
-
-
 
     F = objective(board)  # Objective function
     
@@ -230,9 +241,28 @@ def SA():
             board = random.choice(neighbours)
     
         temperature -= 0.04
+
     return max_board
 
 final_board = SA()
+
+#Printing the final solution, validation and elapsed time
+print""
+print"Board:"
+print" "
 print_board(final_board)
-print (validateBoard(final_board))
+print "Valid board:",validateBoard(final_board)
+elapsedTime = time.time() - startTime
+print "Elapsed time:","{0:.4f}".format(elapsedTime),"seconds"
+
+
+
+#Class holding colors for console printing
+class bcolors:
+    PURPLE = '\033[95m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    ENDC = '\033[0m'
 
