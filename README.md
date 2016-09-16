@@ -1,2 +1,3 @@
-Simulated Annealing, finding solutions to the egg carton puzzle. 
+Simulated Annealing
 ==
+Finding solutions to the egg carton puzzle. 
